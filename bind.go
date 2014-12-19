@@ -23,8 +23,16 @@ type ToConversion interface {
 	ToString() string
 }
 
-type BindOptionInterface interface {
+type Binder interface {
 	AutoMapForm() bool
+}
+
+// nobind is a pre defined struct to ask no auto bind
+type NoBind struct {
+}
+
+func (NoBind) AutoMapForm() bool {
+	return false
 }
 
 type Binds struct {
@@ -38,7 +46,7 @@ func (binds *Binds) SetLogger(logger tango.Logger) {
 func (binds *Binds) Handle(ctx *tango.Context) {
 	if action := ctx.Action(); action != nil {
 		// if action ask don't automap then continue
-		if checker, ok := action.(BindOptionInterface); ok && !checker.AutoMapForm() {
+		if checker, ok := action.(Binder); ok && !checker.AutoMapForm() {
 			ctx.Next()
 			return
 		}

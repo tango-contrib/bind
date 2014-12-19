@@ -16,7 +16,7 @@ type BindExample struct {
 	Name string
 }
 
-func (a *BindExample) Do() string {
+func (a *BindExample) Get() string {
 	return fmt.Sprintf("%d-%s", a.Id, a.Name)
 }
 
