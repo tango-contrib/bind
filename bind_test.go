@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 	"bytes"
-	"compress/gzip"
-	"io/ioutil"
 	"net/http"
+	"net/http/httptest"
+	"reflect"
 
 	"github.com/lunny/tango"
 )
@@ -21,60 +21,34 @@ func (a *BindExample) Get() string {
 }
 
 func TestBind(t *testing.T) {
-	go func() {
-		t := tango.Classic()
-		t.Use(new(Binds))
-		t.Get("/", new(BindExample))
-		t.Run("0.0.0.0:9997")
-	}()
+	buff := bytes.NewBufferString("")
+	recorder := httptest.NewRecorder()
+	recorder.Body = buff
 
-	res, err := get("http://localhost:9997/?id=1&name=lllll")
+	o := tango.Classic()
+	o.Use(new(Binds))
+	o.Get("/", new(BindExample))
+
+	req, err := http.NewRequest("GET", "http://localhost:3000/?id=1&name=lllll", nil)
 	if err != nil {
 		t.Error(err)
-		return
 	}
 
-	if res != "1-lllll" {
-		t.Error("not equal "+res+" != 1-lllll")
-		return
+	o.ServeHTTP(recorder, req)
+	expect(t, recorder.Code, http.StatusOK)
+	refute(t, len(buff.String()), 0)
+	expect(t, buff.String(), "1-lllll")
+}
+
+/* Test Helpers */
+func expect(t *testing.T, a interface{}, b interface{}) {
+	if a != b {
+		t.Errorf("Expected %v (type %v) - Got %v (type %v)", b, reflect.TypeOf(b), a, reflect.TypeOf(a))
 	}
 }
 
-func gzipDecode(src []byte) ([]byte, error) {
-	rd := bytes.NewReader(src)
-	b, err := gzip.NewReader(rd)
-	if err != nil {
-		return nil, err
+func refute(t *testing.T, a interface{}, b interface{}) {
+	if a == b {
+		t.Errorf("Did not expect %v (type %v) - Got %v (type %v)", b, reflect.TypeOf(b), a, reflect.TypeOf(a))
 	}
-
-	defer b.Close()
-
-	data, err := ioutil.ReadAll(b)
-	if err != nil {
-		return nil, err
-	}
-
-	return data, nil
-}
-
-func get(url string) (string, error) {
-	resp, err := http.Get(url)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	bs, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-
-	if resp.Header.Get("Content-Encoding") == "gzip" {
-		data, err := gzipDecode(bs)
-		if err != nil {
-			return "", err
-		}
-		return string(data), nil
-	}
-	return string(bs), nil
 }

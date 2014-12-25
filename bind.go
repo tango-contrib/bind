@@ -39,6 +39,10 @@ type Binds struct {
 	logger tango.Logger
 }
 
+func Default() *Binds {
+	return &Binds{}
+}
+
 func (binds *Binds) SetLogger(logger tango.Logger) {
 	binds.logger = logger
 }
