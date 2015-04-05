@@ -36,15 +36,10 @@ func (NoBind) AutoMapForm() bool {
 }
 
 type Binds struct {
-	logger tango.Logger
 }
 
 func Default() *Binds {
 	return &Binds{}
-}
-
-func (binds *Binds) SetLogger(logger tango.Logger) {
-	binds.logger = logger
 }
 
 func (binds *Binds) Handle(ctx *tango.Context) {
@@ -57,7 +52,7 @@ func (binds *Binds) Handle(ctx *tango.Context) {
 
 		if ctx.Route().IsStruct() {
 			vc := reflect.ValueOf(action)
-			namedStructMap(binds.logger, vc.Elem(), ctx.Req(), "")
+			namedStructMap(ctx.Logger, vc.Elem(), ctx.Req(), "")
 		}
 	}
 

@@ -2,7 +2,7 @@ Bind [![Build Status](https://drone.io/github.com/tango-contrib/bind/status.png)
 ======
 
 ** HEAVILLY DEVELOPMENT **
-Bind is a query param auto mapping middleware for [Tango](https://github.com/lunny/tango). 
+Bind is a query param auto mapping middleware for [Tango](https://github.com/lunny/tango). Please use [binding](https://github.com/tango-contrib/binding)
 
 ## Installation
 
