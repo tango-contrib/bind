@@ -18,7 +18,7 @@ import (
     "github.com/tango-contrib/bind"
 )
 
-ype BindExample struct {
+type BindExample struct {
     Id   int64
     Name string
 }
